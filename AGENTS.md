@@ -8,11 +8,11 @@ This repository holds only the user app, a React + TypeScript SPA built with Vit
 
 Work is tracked on Trello, with one board per sprint.
 
-| Sprint | Board | Holds |
-| --- | --- | --- |
-| `S0` | [Phase 0 - Concept/Requirements](https://trello.com/b/AWtmVjbe/phase-0-concept-requirements) | Requirements and design cards for every feature |
-| `S1` | [Sprint 1 - App Shell](https://trello.com/b/4mU9eMMY/sprint-1-app-shell) | Development, quality assurance, and deployment cards |
-| `S2` | [Sprint 2 - Channels](https://trello.com/b/lNKyrJkq/sprint-2-channels) | Development, quality assurance, and deployment cards |
+| Sprint | Board |
+| --- | --- |
+| `S0` | [Phase 0 - Concept/Requirements](https://trello.com/b/AWtmVjbe/phase-0-concept-requirements) |
+| `S1` | [Sprint 1 - App Shell](https://trello.com/b/4mU9eMMY/sprint-1-app-shell) |
+| `S2` | [Sprint 2 - Channels](https://trello.com/b/lNKyrJkq/sprint-2-channels) |
 
 Rules for every board:
 
@@ -20,6 +20,22 @@ Rules for every board:
 - **Titles:** `<sprint>-<n>: <short description>`, such as `S0-4: Write product vision`. Number cards in order on each board. Never reuse or renumber one.
 - **Labels:** at least one per card, naming its [commit type](#commit-messages), such as `feat` or `docs`.
 - **Access:** agents can read, edit and move cards, including comments and labels. Never create or delete a card.
+
+## Code Structure
+
+Code in `src/` is grouped by feature. Create a folder when you have a file to put in it.
+
+| Folder | Holds |
+| --- | --- |
+| `app/` | Routes, layouts, and the app shell |
+| `features/<feature>/` | Pages for area of the app, such as Channels |
+| `features/<feature>/api/` | API types and hooks that fetch or change data |
+| `features/<feature>/components/` | Components and hooks used only by this feature |
+| `features/<feature>/lib/` | Logic without React, and its unit tests |
+| `fake-api/` | The fake back end, deleted once the real API exists |
+| `components/`, `hooks/`, `lib/` | Code used across features |
+
+A feature can import from another feature's `api/` but from nothing else in it.
 
 ## Git Workflow
 
