@@ -28,12 +28,13 @@ Code in `src/` is grouped by feature. Create a folder when you have a file to pu
 | Folder | Holds |
 | --- | --- |
 | `app/` | Routes, layouts, and the app shell |
-| `features/<feature>/` | Pages for area of the app, such as Channels |
+| `features/<feature>/` | Pages for an area of the app, such as Channels |
 | `features/<feature>/api/` | API types and hooks that fetch or change data |
-| `features/<feature>/components/` | Components and hooks used only by this feature |
+| `features/<feature>/components/` | Components used only by this feature |
+| `features/<feature>/hooks/` | Other hooks used only by this feature |
 | `features/<feature>/lib/` | Logic without React, and its unit tests |
 | `fake-api/` | The fake back end, deleted once the real API exists |
-| `components/`, `hooks/`, `lib/` | Code used across features |
+| `components/`, `hooks/`, `lib/` | Code that isn't specific to one feature |
 
 A feature can import from another feature's `api/` but from nothing else in it.
 
