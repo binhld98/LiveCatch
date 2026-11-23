@@ -5,10 +5,9 @@ import ChannelStatusBadge from './channel-status-badge.tsx'
 
 type ChannelCardHeaderProps = {
   channel: Channel
-  nameId: string
 }
 
-function ChannelCardHeader({ channel, nameId }: ChannelCardHeaderProps) {
+function ChannelCardHeader({ channel }: ChannelCardHeaderProps) {
   const account = accountName(channel)
 
   return (
@@ -21,7 +20,7 @@ function ChannelCardHeader({ channel, nameId }: ChannelCardHeaderProps) {
         </AvatarFallback>
       </Avatar>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <h2 id={nameId} className="truncate font-semibold">
+        <h2 className="truncate font-semibold">
           {channel.name}
         </h2>
         {/* Only the account name is cut off, so the platform always shows. */}
