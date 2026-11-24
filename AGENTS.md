@@ -1,6 +1,6 @@
 # LiveCatch
 
-LiveCatch records live streams: users follow a host or channel by URL, the app records each broadcast automatically when it goes live, and users watch or download the recordings later.
+LiveCatch records live broadcasts: users add a channel by URL and turn listening on, the app records each of its broadcasts automatically, and users watch or download the recordings later.
 
 This repository holds only the user app, a React + TypeScript SPA built with Vite. The back end, admin console, and landing pages are out of scope.
 
