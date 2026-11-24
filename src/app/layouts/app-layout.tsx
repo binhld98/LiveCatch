@@ -14,7 +14,8 @@ function AppLayout() {
       {/* Not SidebarInset: it renders a <main> of its own, and the page's <main> lives in here. */}
       <div className="flex min-w-0 flex-1 flex-col bg-background">
         <TopBar />
-        <main id="content" className="flex flex-1 flex-col p-4">
+        {/* Content stops growing at 1872px and centers. */}
+        <main id="content" className="mx-auto flex w-full max-w-[1872px] flex-1 flex-col p-4">
           {/* A crashing page shows PageError here while the nav keeps working. Navigating away clears it. */}
           <ErrorBoundary resetKey={pathname} fallback={(reset) => <PageError onRetry={reset} />}>
             <Outlet />
