@@ -19,7 +19,14 @@ let listChannelsCalls = 0
 export async function listChannels(): Promise<ChannelList> {
   await latency()
   listChannelsCalls += 1
-  if (isScenarioOn('load-fails') || (isScenarioOn('refetch-fails') && listChannelsCalls > 1)) {
+  const failedBy = isScenarioOn('load-fails')
+    ? 'load-fails'
+    : isScenarioOn('refetch-fails') && listChannelsCalls > 1
+      ? 'refetch-fails'
+      : null
+  if (failedBy !== null) {
+    // Logged, so QA can see a refetch fail even though the page shows nothing.
+    console.info(`Fake API: listChannels failed (scenario ${failedBy}).`)
     throw new Error('Fake API: listChannels failed')
   }
   const items = isScenarioOn('empty')
