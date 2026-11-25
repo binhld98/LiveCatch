@@ -38,6 +38,17 @@ Code in `src/` is grouped by feature. Create a folder when you have a file to pu
 
 A feature can import from another feature's `api/` but from nothing else in it.
 
+## Code Comments
+
+Comment only what the code can't say: a reason, a constraint, a rejected alternative, code that looks removable but isn't, or library or browser behavior a reader wouldn't expect. When code needs a comment to say what it does, rename or rewrite it instead.
+
+- **Doc comments:** write `/** */` above an export, prop or API type field only when a caller needs more than its name and type, such as what `null` means. Editors show it on hover. Leave out JSDoc types (`{string}`) and `@param` or `@returns` lines that restate the signature. Use `//` (`{/* */}` in JSX) for implementation notes.
+- **Numbers:** leave sizes and limits to the code, and say why a number is what it is or how it adds up. A comment that repeats a Tailwind class's number goes stale when the class changes.
+- **Plans:** describe what the code does now. For unfinished work, say what's missing and name the card that adds it, such as `Does nothing yet: S2-3 adds start and stop listening.`, or a specific event when there's no card. Write no `TODO`, `FIXME` or `XXX`.
+- **Outside facts:** name the source precisely enough to recheck it: the library and component (`Base UI's Close`), the card, the doc and its repo (`livecatch.md in LiveCatchHome`), or the URL of copied code or a spec.
+- **Suppressions:** fix the error instead. If you can't, cover one line, name the rule and give a reason: `// @ts-expect-error -- <reason>` or `// oxlint-disable-next-line <rule> -- <reason>`. Never suppress `react/rules-of-hooks` or `react/exhaustive-deps`: change the code.
+- **Generated code:** leave the comments in `src/components/ui` as shadcn generated them, and put notes in the app's own wrapper.
+
 ## Git Workflow
 
 `main` is the only long-lived branch and must stay releasable.
