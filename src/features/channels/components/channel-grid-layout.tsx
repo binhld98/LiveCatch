@@ -7,7 +7,7 @@ function ChannelGridLayout({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       className={cn(
-        'grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(max(min(290px,100%),calc((100%_-_3rem)/4)),1fr))] gap-4',
+        'grid auto-rows-fr grid-cols-[repeat(auto-fill,minmax(max(min(290px,100%),calc((100%-3rem)/4)),1fr))] gap-4',
         className,
       )}
       {...props}
