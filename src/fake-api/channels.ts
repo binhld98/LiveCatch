@@ -13,23 +13,25 @@ function latency() {
   return new Promise<void>((resolve) => setTimeout(resolve, LATENCY_MS))
 }
 
-let listChannelsCalls = 0
+// For channels.refetch-fails, which lets only the first load work. Once listChannels takes a search,
+// status and page (S2-10, S2-11), this tracks each of them, so a first load of a new one still works.
+let listedOnce = false
 
 // Newest added first.
 export async function listChannels(): Promise<ChannelList> {
   await latency()
-  listChannelsCalls += 1
-  const failedBy = isScenarioOn('load-fails')
-    ? 'load-fails'
-    : isScenarioOn('refetch-fails') && listChannelsCalls > 1
-      ? 'refetch-fails'
+  const failedBy = isScenarioOn('channels.load-fails')
+    ? 'channels.load-fails'
+    : isScenarioOn('channels.refetch-fails') && listedOnce
+      ? 'channels.refetch-fails'
       : null
   if (failedBy !== null) {
     // Logged, so QA can see a refetch fail even though the page shows nothing.
     console.info(`Fake API: listChannels failed (scenario ${failedBy}).`)
     throw new Error('Fake API: listChannels failed')
   }
-  const items = isScenarioOn('empty')
+  listedOnce = true
+  const items = isScenarioOn('channels.empty')
     ? []
     : channels.toSorted((a, b) => Date.parse(b.addedAt) - Date.parse(a.addedAt))
   // Copies, as a real response would be, so changing the store never changes cached data in place.

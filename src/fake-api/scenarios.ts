@@ -1,11 +1,15 @@
-// The scenario switch: lets anyone reach a state of the app on purpose. Open any page with
-// ?scenario=empty, or several at once with ?scenario=load-fails,refetch-fails. The tab remembers them,
-// so in-app links and reloads keep them, and ?scenario= with no value turns them all off. It ships in the
-// Pages build too, since that runs on the fake API, and goes with the rest of fake-api/.
+// The scenario switch, for the whole app: lets anyone reach a state on purpose. Open any page with
+// ?scenario=channels.empty, or several at once with ?scenario=channels.load-fails,channels.refetch-fails.
+// The tab remembers them, so in-app links and reloads keep them, and ?scenario= with no value turns them
+// all off. It ships in the Pages build too, since that runs on the fake API, and goes with the rest of
+// fake-api/.
+//
+// Every scenario is listed here, named `<area>.<scenario>` and grouped by area, so a name can't clash
+// with another area's and a typo in isScenarioOn() fails to compile.
 const scenarios = {
-  empty: 'The user has no channels.',
-  'load-fails': 'Loading channels always fails.',
-  'refetch-fails': 'The first load of channels works, and every later one fails.',
+  'channels.empty': 'The user has no channels.',
+  'channels.load-fails': 'Loading channels always fails.',
+  'channels.refetch-fails': 'The first load of channels works, and every later one fails.',
 } as const
 
 export type Scenario = keyof typeof scenarios
