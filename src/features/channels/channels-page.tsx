@@ -5,15 +5,15 @@ import ChannelGridPlaceholder from './components/channel-grid-placeholder.tsx'
 import LoadFailed from './components/load-failed.tsx'
 import NoChannels from './components/no-channels.tsx'
 
-// The state depends only on whether the app has a copy of the cards, not on the query's status: with a
-// copy the grid shows, and a refetch shows no indicator and, if it fails, leaves the grid as it was.
+// Picks the state from whether there's data, not from the query's status, so a refetch, failed or not,
+// leaves the grid as it was.
 function ChannelsContent() {
   const { data, isError, isFetching, refetch } = useChannels()
 
   if (data) {
     return data.items.length === 0 ? <NoChannels /> : <ChannelGrid channels={data.items} />
   }
-  // While "Try again" runs, the placeholders show again.
+  // isError stays true while "Try again" refetches, and the placeholders should show meanwhile.
   if (isError && !isFetching) {
     return <LoadFailed onRetry={() => void refetch()} />
   }
