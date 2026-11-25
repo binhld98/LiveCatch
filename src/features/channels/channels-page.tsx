@@ -1,15 +1,30 @@
 import PageHeader from '@/components/page-header.tsx'
 import useChannels from './api/use-channels.ts'
 import ChannelGrid from './components/channel-grid.tsx'
+import ChannelGridPlaceholder from './components/channel-grid-placeholder.tsx'
+import LoadFailed from './components/load-failed.tsx'
+import NoChannels from './components/no-channels.tsx'
 
-// Shows nothing while loading or after a failed load: S2-2 adds those states.
+// Picks the state from whether there's data, not from the query's status, so a refetch, failed or not,
+// leaves the grid as it was.
+function ChannelsContent() {
+  const { data, isError, isFetching, refetch } = useChannels()
+
+  if (data) {
+    return data.items.length === 0 ? <NoChannels /> : <ChannelGrid channels={data.items} />
+  }
+  // isError stays true while "Try again" refetches, and the placeholders should show meanwhile.
+  if (isError && !isFetching) {
+    return <LoadFailed onRetry={() => void refetch()} />
+  }
+  return <ChannelGridPlaceholder />
+}
+
 function ChannelsPage() {
-  const { data } = useChannels()
-
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title="Channels" description="Add channels and choose which ones to listen to." />
-      {data && <ChannelGrid channels={data.items} />}
+      <ChannelsContent />
     </div>
   )
 }

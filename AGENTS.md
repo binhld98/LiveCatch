@@ -6,19 +6,15 @@ This repository holds only the user app, a React + TypeScript SPA built with Vit
 
 ## Task Tracking
 
-Work is tracked on Trello, with one board per sprint.
+Work is tracked on Trello, with one board and one design canvas per sprint.
 
-| Sprint | Board |
-| --- | --- |
-| `S0` | [Phase 0 - Concept/Requirements](https://trello.com/b/AWtmVjbe/phase-0-concept-requirements) |
-| `S1` | [Sprint 1 - App Shell](https://trello.com/b/4mU9eMMY/sprint-1-app-shell) |
-| `S2` | [Sprint 2 - Channels](https://trello.com/b/lNKyrJkq/sprint-2-channels) |
-
-Rules for every board:
+| Sprint | Board | Canvas |
+| --- | --- | --- |
+| `S0` | [Phase 0 - Concept/Requirements](https://trello.com/b/AWtmVjbe/phase-0-concept-requirements) | N/A |
+| `S1` | [Sprint 1 - App Shell](https://trello.com/b/4mU9eMMY/sprint-1-app-shell) | [LiveCatch Shell Layout](https://claude.ai/artifact/JaDArZNkSaYorXak31SKQb) |
+| `S2` | [Sprint 2 - Channels](https://trello.com/b/lNKyrJkq/sprint-2-channels) | [LiveCatch Channels artboards](https://claude.ai/artifact/Gqe9siuuEATWK1cPq7xhmj) |
 
 - **Lists:** Backlog → Queued → In Progress → In Review → Closed.
-- **Titles:** `<sprint>-<n>: <short description>`, such as `S0-4: Write product vision`. Number cards in order on each board. Never reuse or renumber one.
-- **Labels:** at least one per card, naming its [commit type](#commit-messages), such as `feat` or `docs`.
 - **Access:** agents can read, edit and move cards, including comments and labels. Never create or delete a card.
 
 ## Code Structure
@@ -38,40 +34,38 @@ Code in `src/` is grouped by feature. Create a folder when you have a file to pu
 
 A feature can import from another feature's `api/` but from nothing else in it.
 
+## Code Comments
+
+Comment only what the code can't say, such as a reason, a constraint, or surprising library or browser behavior. When code needs a comment to say what it does, rename or rewrite it instead.
+
+- **Concise:** keep comments brief and focused on intent, usually one short sentence. Say each reason once, where the code decides it.
+- **Doc comments:** use `/** */` for what a caller needs beyond the name and type, and `//` for implementation notes. Skip JSDoc types and `@param` or `@returns` lines that restate the signature.
+- **Plans:** describe what the code does now. For unfinished work, name the card that adds it, such as `Does nothing yet: S2-3 adds start and stop listening.` Write no `TODO`, `FIXME` or `XXX`.
+- **Suppressions:** cover one line, name the rule and give a reason. Never suppress `react/rules-of-hooks` or `react/exhaustive-deps`.
+- **Generated code:** leave the comments in `src/components/ui` as shadcn generated them.
+
 ## Git Workflow
 
 `main` is the only long-lived branch and must stay releasable.
 
-1. Do each piece of work in its own `<type>/<slug>` branch from `main`, such as `feat/add-channel`.
-2. When the user approves the work, commit it, push the branch, and open a PR into `main`.
-3. Never merge the PR yourself. The user squash merges it and deletes the remote branch on GitHub.
-4. When the user confirms the PR is done, switch to `main`, pull it, and delete the local branch.
+1. Do each card in its own `<type>/<slug>` branch from `main`, such as `feat/add-channel`. Small side changes can ride along as their own commits.
+2. When the work is done, ask the user to review it. Repeat for each round of revisions.
+3. When the user approves, commit anything left, push the branch and open a PR into `main`.
+4. Never merge the PR yourself. The user squash merges it and deletes the remote branch on GitHub.
+5. When the user confirms the PR is done, switch to `main`, pull it, and delete the local branch.
+
+Commit messages:
+
+```text
+<type>[(<scope>)]: <short description>
+```
+
+- Keep the subject to one lowercase line, ideally 50 characters or fewer.
+- Branch and commit types come from the same list: `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style` and `test`.
+- Scope is the feature or `src/` folder changed, such as `channels` or `fake-api`. Omit it if several.
+- Add no body or footer except a `Co-Authored-By:` trailer, separated from the subject by a blank line.
 
 Releases happen only when the user asks:
 
 - **Release:** tag `main` with a version, such as `v0.3.0`.
 - **Hotfix an old release:** fix on `main`, cherry-pick the fix into a release branch cut from the release's tag, such as `release/v0.3.x`, and tag the next patch, such as `v0.3.1`.
-
-## Commit Messages
-
-```text
-<type>[optional scope]: <short description>
-```
-
-- Keep the subject to one lowercase line, ideally 50 characters or fewer.
-- Add no body or footer. The one exception is a `Co-Authored-By:` trailer, separated from the subject by a blank line.
-
-| Type | Use for |
-| --- | --- |
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `docs` | Documentation updates |
-| `chore` | Non-production maintenance, such as tooling or dependency updates |
-| `refactor` | Code changes that neither add a feature nor fix a bug |
-| `test` | Adding or updating tests |
-| `style` | Formatting or whitespace changes with no behavior impact |
-| `ci` | Continuous integration changes |
-| `build` | Build system or external dependency changes |
-| `perf` | Performance improvement |
-| `arch` | Big architecture decision |
-| `revert` | Reverting a previous commit |
