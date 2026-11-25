@@ -1,11 +1,6 @@
-// The scenario switch, for the whole app: lets anyone reach a state on purpose. Open any page with
-// ?scenario=channels.empty, or several at once with ?scenario=channels.load-fails,channels.refetch-fails.
-// The tab remembers them, so in-app links and reloads keep them, and ?scenario= with no value turns them
-// all off. It ships in the Pages build too, since that runs on the fake API, and goes with the rest of
-// fake-api/.
-//
-// Every scenario is listed here, named `<area>.<scenario>` and grouped by area, so a name can't clash
-// with another area's and a typo in isScenarioOn() fails to compile.
+// Lets anyone reach a state on purpose: open any page with ?scenario=channels.empty, or several names
+// separated by commas. The tab keeps them until a page opens with ?scenario= and no value. It ships in
+// the Pages build, which runs on the fake API too. Names are `<area>.<scenario>`, so areas never clash.
 const scenarios = {
   'channels.empty': 'The user has no channels.',
   'channels.load-fails': 'Loading channels always fails.',
@@ -20,8 +15,8 @@ function isScenario(name: string): name is Scenario {
   return Object.hasOwn(scenarios, name)
 }
 
-// Storage can be blocked (private windows, blocked site data): the switch then lasts until the URL changes.
-function remembered() {
+// Storage can be blocked, as in private windows: the switch then lasts until the URL changes.
+function storedScenarios() {
   try {
     return sessionStorage.getItem(STORAGE_KEY) ?? ''
   } catch {
@@ -29,7 +24,7 @@ function remembered() {
   }
 }
 
-function remember(value: string) {
+function storeScenarios(value: string) {
   try {
     if (value === '') {
       sessionStorage.removeItem(STORAGE_KEY)
@@ -37,16 +32,16 @@ function remember(value: string) {
       sessionStorage.setItem(STORAGE_KEY, value)
     }
   } catch {
-    // Not remembered: see remembered().
+    // Blocked: see storedScenarios().
   }
 }
 
 function readScenarios() {
   const fromUrl = new URLSearchParams(window.location.search).get('scenario')
   if (fromUrl !== null) {
-    remember(fromUrl)
+    storeScenarios(fromUrl)
   }
-  const names = (fromUrl ?? remembered())
+  const names = (fromUrl ?? storedScenarios())
     .split(',')
     .map((name) => name.trim())
     .filter((name) => name !== '')
@@ -65,9 +60,8 @@ function readScenarios() {
   return active
 }
 
-// Read once, when the app loads.
-const active = readScenarios()
+const activeScenarios = readScenarios()
 
 export function isScenarioOn(scenario: Scenario) {
-  return active.has(scenario)
+  return activeScenarios.has(scenario)
 }
