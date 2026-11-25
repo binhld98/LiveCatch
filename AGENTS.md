@@ -36,14 +36,12 @@ A feature can import from another feature's `api/` but from nothing else in it.
 
 ## Code Comments
 
-Comment only what the code can't say: a reason, a constraint, a rejected alternative, code that looks removable but isn't, or library or browser behavior a reader wouldn't expect. When code needs a comment to say what it does, rename or rewrite it instead.
+Comment only what the code can't say, such as a reason, a constraint, or surprising library or browser behavior. When code needs a comment to say what it does, rename or rewrite it instead.
 
-- **Doc comments:** write `/** */` above an export, prop or API type field only when a caller needs more than its name and type, such as what `null` means. Editors show it on hover. Leave out JSDoc types (`{string}`) and `@param` or `@returns` lines that restate the signature. Use `//` (`{/* */}` in JSX) for implementation notes.
-- **Numbers:** leave sizes and limits to the code, and say why a number is what it is or how it adds up. A comment that repeats a Tailwind class's number goes stale when the class changes.
-- **Plans:** describe what the code does now. For unfinished work, say what's missing and name the card that adds it, such as `Does nothing yet: S2-3 adds start and stop listening.`, or a specific event when there's no card. Write no `TODO`, `FIXME` or `XXX`.
-- **Outside facts:** name the source precisely enough to recheck it: the library and component (`Base UI's Close`), the card, the doc and its repo (`livecatch.md in LiveCatchHome`), or the URL of copied code or a spec.
-- **Suppressions:** fix the error instead. If you can't, cover one line, name the rule and give a reason: `// @ts-expect-error -- <reason>` or `// oxlint-disable-next-line <rule> -- <reason>`. Never suppress `react/rules-of-hooks` or `react/exhaustive-deps`: change the code.
-- **Generated code:** leave the comments in `src/components/ui` as shadcn generated them, and put notes in the app's own wrapper.
+- **Doc comments:** use `/** */` for what a caller needs beyond the name and type, and `//` for implementation notes. Skip JSDoc types and `@param` or `@returns` lines that restate the signature.
+- **Plans:** describe what the code does now. For unfinished work, name the card that adds it, such as `Does nothing yet: S2-3 adds start and stop listening.` Write no `TODO`, `FIXME` or `XXX`.
+- **Suppressions:** cover one line, name the rule and give a reason. Never suppress `react/rules-of-hooks` or `react/exhaustive-deps`.
+- **Generated code:** leave the comments in `src/components/ui` as shadcn generated them.
 
 ## Git Workflow
 
@@ -54,31 +52,18 @@ Comment only what the code can't say: a reason, a constraint, a rejected alterna
 3. Never merge the PR yourself. The user squash merges it and deletes the remote branch on GitHub.
 4. When the user confirms the PR is done, switch to `main`, pull it, and delete the local branch.
 
+Commit messages:
+
+```text
+<type>[(<scope>)]: <short description>
+```
+
+- Keep the subject to one lowercase line, ideally 50 characters or fewer.
+- Branch and commit types come from the same list: `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style` and `test`.
+- Scope is the feature or `src/` folder changed, such as `channels` or `fake-api`. Omit it if several.
+- Add no body or footer except a `Co-Authored-By:` trailer, separated from the subject by a blank line.
+
 Releases happen only when the user asks:
 
 - **Release:** tag `main` with a version, such as `v0.3.0`.
 - **Hotfix an old release:** fix on `main`, cherry-pick the fix into a release branch cut from the release's tag, such as `release/v0.3.x`, and tag the next patch, such as `v0.3.1`.
-
-## Commit Messages
-
-```text
-<type>[optional scope]: <short description>
-```
-
-- Keep the subject to one lowercase line, ideally 50 characters or fewer.
-- Add no body or footer. The one exception is a `Co-Authored-By:` trailer, separated from the subject by a blank line.
-
-| Type | Use for |
-| --- | --- |
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `docs` | Documentation updates |
-| `chore` | Non-production maintenance, such as tooling or dependency updates |
-| `refactor` | Code changes that neither add a feature nor fix a bug |
-| `test` | Adding or updating tests |
-| `style` | Formatting or whitespace changes with no behavior impact |
-| `ci` | Continuous integration changes |
-| `build` | Build system or external dependency changes |
-| `perf` | Performance improvement |
-| `arch` | Big architecture decision |
-| `revert` | Reverting a previous commit |
