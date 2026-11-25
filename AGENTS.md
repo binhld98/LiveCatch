@@ -38,6 +38,7 @@ A feature can import from another feature's `api/` but from nothing else in it.
 
 Comment only what the code can't say, such as a reason, a constraint, or surprising library or browser behavior. When code needs a comment to say what it does, rename or rewrite it instead.
 
+- **Concise:** keep comments brief and focused on intent, usually one short sentence. Say each reason once, where the code decides it.
 - **Doc comments:** use `/** */` for what a caller needs beyond the name and type, and `//` for implementation notes. Skip JSDoc types and `@param` or `@returns` lines that restate the signature.
 - **Plans:** describe what the code does now. For unfinished work, name the card that adds it, such as `Does nothing yet: S2-3 adds start and stop listening.` Write no `TODO`, `FIXME` or `XXX`.
 - **Suppressions:** cover one line, name the rule and give a reason. Never suppress `react/rules-of-hooks` or `react/exhaustive-deps`.
@@ -47,10 +48,11 @@ Comment only what the code can't say, such as a reason, a constraint, or surpris
 
 `main` is the only long-lived branch and must stay releasable.
 
-1. Do each piece of work in its own `<type>/<slug>` branch from `main`, such as `feat/add-channel`.
-2. When the user approves the work, commit it, push the branch, and open a PR into `main`.
-3. Never merge the PR yourself. The user squash merges it and deletes the remote branch on GitHub.
-4. When the user confirms the PR is done, switch to `main`, pull it, and delete the local branch.
+1. Do each card in its own `<type>/<slug>` branch from `main`, such as `feat/add-channel`. Small side changes can ride along as their own commits.
+2. When the work is done, ask the user to review it. Repeat for each round of revisions.
+3. When the user approves, commit anything left, push the branch and open a PR into `main`.
+4. Never merge the PR yourself. The user squash merges it and deletes the remote branch on GitHub.
+5. When the user confirms the PR is done, switch to `main`, pull it, and delete the local branch.
 
 Commit messages:
 
