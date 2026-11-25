@@ -6,19 +6,15 @@ This repository holds only the user app, a React + TypeScript SPA built with Vit
 
 ## Task Tracking
 
-Work is tracked on Trello, with one board per sprint.
+Work is tracked on Trello, with one board and one design canvas per sprint.
 
-| Sprint | Board |
-| --- | --- |
-| `S0` | [Phase 0 - Concept/Requirements](https://trello.com/b/AWtmVjbe/phase-0-concept-requirements) |
-| `S1` | [Sprint 1 - App Shell](https://trello.com/b/4mU9eMMY/sprint-1-app-shell) |
-| `S2` | [Sprint 2 - Channels](https://trello.com/b/lNKyrJkq/sprint-2-channels) |
-
-Rules for every board:
+| Sprint | Board | Canvas |
+| --- | --- | --- |
+| `S0` | [Phase 0 - Concept/Requirements](https://trello.com/b/AWtmVjbe/phase-0-concept-requirements) | N/A |
+| `S1` | [Sprint 1 - App Shell](https://trello.com/b/4mU9eMMY/sprint-1-app-shell) | [LiveCatch Shell Layout](https://claude.ai/artifact/JaDArZNkSaYorXak31SKQb) |
+| `S2` | [Sprint 2 - Channels](https://trello.com/b/lNKyrJkq/sprint-2-channels) | [LiveCatch Channels artboards](https://claude.ai/artifact/Gqe9siuuEATWK1cPq7xhmj) |
 
 - **Lists:** Backlog → Queued → In Progress → In Review → Closed.
-- **Titles:** `<sprint>-<n>: <short description>`, such as `S0-4: Write product vision`. Number cards in order on each board. Never reuse or renumber one.
-- **Labels:** at least one per card, naming its [commit type](#commit-messages), such as `feat` or `docs`.
 - **Access:** agents can read, edit and move cards, including comments and labels. Never create or delete a card.
 
 ## Code Structure
