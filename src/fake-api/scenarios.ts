@@ -5,6 +5,8 @@ const scenarios = {
   'channels.empty': 'The user has no channels.',
   'channels.load-fails': 'Loading channels always fails.',
   'channels.refetch-fails': 'The first load of channels works, and every later one fails.',
+  'channels.start-listening-fails': 'Starting listening always fails.',
+  'channels.stop-listening-fails': 'Stopping listening always fails.',
 } as const
 
 export type Scenario = keyof typeof scenarios
