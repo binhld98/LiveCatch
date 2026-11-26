@@ -4,23 +4,20 @@ import { Link } from 'react-router'
 import { Badge } from '@/components/ui/badge.tsx'
 import { buttonVariants } from '@/components/ui/button.tsx'
 import { SidebarMenu } from '@/components/ui/sidebar.tsx'
-import { Skeleton } from '@/components/ui/skeleton.tsx'
-import { type PlanUsage as PlanUsageData, planLabels } from '@/features/billing/api/plan-usage.ts'
+import type { PlanUsage as PlanUsageData } from '@/features/billing/api/plan-usage.ts'
 import usePlanUsage from '@/features/billing/api/use-plan-usage.ts'
 import NavMenuItem from './nav-menu-item.tsx'
 import useCloseDrawerOnPick from './use-close-drawer-on-pick.ts'
 
 type UsageMeterProps = {
   label: string
-  // The meter's accessible name, when it should say more than the visible label.
-  name: string
   used: number
   total: number
 }
 
 // A Base UI Meter, not shadcn's progress: this is an amount out of a limit, not a task in progress.
 // Screen readers get the name and "7.5 of 10" from the meter, so the visible row is hidden from them.
-function UsageMeter({ label, name, used, total }: UsageMeterProps) {
+function UsageMeter({ label, used, total }: UsageMeterProps) {
   return (
     <div className="flex flex-col gap-1.5">
       <div aria-hidden="true" className="flex items-baseline justify-between gap-2">
@@ -32,7 +29,7 @@ function UsageMeter({ label, name, used, total }: UsageMeterProps) {
       <Meter.Root
         value={used}
         max={total}
-        aria-label={name}
+        aria-label={label}
         getAriaValueText={() => `${used} of ${total}`}
       >
         <Meter.Track className="h-1.5 overflow-hidden rounded-full bg-muted">
@@ -43,64 +40,40 @@ function UsageMeter({ label, name, used, total }: UsageMeterProps) {
   )
 }
 
-function planBadgeText({ plan, isEnded }: PlanUsageData) {
+function planName({ plan, isEnded }: PlanUsageData) {
   if (isEnded) {
     return plan === 'trial' ? 'Trial ended' : 'Plan ended'
   }
-  return planLabels[plan]
-}
-
-// Mirrors the badge and meter rows at their heights, so the card doesn't grow when the usage loads.
-function PlanUsagePlaceholder() {
-  return (
-    <>
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-muted-foreground">Current plan</span>
-        <Skeleton className="h-5 w-16 rounded-4xl" />
-      </div>
-      <Skeleton className="h-8" />
-      <Skeleton className="h-8" />
-    </>
-  )
+  return `${plan.charAt(0).toUpperCase()}${plan.slice(1)} plan`
 }
 
 // The card shows in the expanded sidebar and the phone drawer. The rail shows a gauge link instead.
 function PlanUsage() {
   const closeDrawer = useCloseDrawerOnPick()
-  const { data: usage, isPending } = usePlanUsage()
-  const summary =
-    usage &&
-    `${usage.hoursUsed} of ${usage.hoursTotal} hours used, ${usage.listenersUsed} of ${usage.listenerLimit} listeners used`
+  const { data: usage } = usePlanUsage()
+  const planText = usage && planName(usage)
 
   return (
     <>
       <section
         aria-label="Plan usage"
-        aria-busy={isPending}
         className="flex flex-col gap-3 rounded-lg border bg-background p-3 text-sm group-data-[collapsible=icon]:hidden"
       >
-        {/* A failed load leaves only "Upgrade plan": the usage refetches on the next focus. */}
-        {isPending && <PlanUsagePlaceholder />}
-        {usage && (
-          <>
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-muted-foreground">Current plan</span>
-              <Badge variant="outline">{planBadgeText(usage)}</Badge>
-            </div>
-            <UsageMeter
-              label="Hours used"
-              name="Recording hours used"
-              used={usage.hoursUsed}
-              total={usage.hoursTotal}
-            />
-            <UsageMeter
-              label="Listeners used"
-              name="Listeners used"
-              used={usage.listenersUsed}
-              total={usage.listenerLimit}
-            />
-          </>
-        )}
+        {/* h-5 is the badge's height, so the row doesn't grow when the plan loads. */}
+        <div className="flex h-5 items-center justify-between gap-2">
+          <span className="text-muted-foreground">Current plan</span>
+          {planText && <Badge variant="outline">{planText}</Badge>}
+        </div>
+        <UsageMeter
+          label="Hours used"
+          used={usage?.hoursUsed ?? 0}
+          total={usage?.hoursTotal ?? 0}
+        />
+        <UsageMeter
+          label="Listeners used"
+          used={usage?.listenersUsed ?? 0}
+          total={usage?.listenerLimit ?? 0}
+        />
         {/* No active state on /billing: only the rail gauge has one. */}
         <Link
           to="/billing"
@@ -115,20 +88,8 @@ function PlanUsage() {
           label="Plan usage"
           to="/billing"
           icon={GaugeIcon}
-          aria-label={summary && `Plan usage: ${planBadgeText(usage)}, ${summary}`}
-          tooltip={
-            usage && (
-              <span className="flex flex-col">
-                <span>{planBadgeText(usage)}</span>
-                <span>
-                  {usage.hoursUsed} of {usage.hoursTotal} hours used
-                </span>
-                <span>
-                  {usage.listenersUsed} of {usage.listenerLimit} listeners used
-                </span>
-              </span>
-            )
-          }
+          aria-label={planText}
+          tooltip={planText}
         />
       </SidebarMenu>
     </>

@@ -9,10 +9,3 @@ export type PlanUsage = {
   hoursUsed: number
   hoursTotal: number
 }
-
-export const planLabels: Record<Plan, string> = {
-  trial: 'Free trial',
-  plus: 'Plus',
-  pro: 'Pro',
-  max: 'Max',
-}
