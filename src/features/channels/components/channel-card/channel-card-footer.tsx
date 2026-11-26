@@ -39,7 +39,7 @@ function ChannelCardFooter({ channel }: ChannelCardFooterProps) {
 
   return (
     <div className="grid grid-cols-2 gap-2">
-      <ListeningButton status={channel.status} />
+      <ListeningButton channel={channel} />
       <div className="grid grid-cols-3 gap-1">
         <IconAction
           label={`Open on ${platformNames[channel.platform]}`}
