@@ -22,13 +22,13 @@ let listedOnce = false
 /** Newest added first. */
 export async function listChannels(): Promise<ChannelList> {
   await latency()
-  if (isScenarioOn('channels.load-fails') || (isScenarioOn('channels.refetch-fails') && listedOnce)) {
+  if (isScenarioOn('channels.loading-fails') || (isScenarioOn('channels.reloading-fails') && listedOnce)) {
     // Logged because a failed refetch leaves the page as it was.
     console.info('Fake API: listChannels failed.')
     fail('listChannels failed')
   }
   listedOnce = true
-  const items = isScenarioOn('channels.empty')
+  const items = isScenarioOn('channels.no-channels')
     ? []
     : channels.toSorted((a, b) => Date.parse(b.addedAt) - Date.parse(a.addedAt))
   // Copies, as a real response would be, so changing the store never changes cached data in place.
