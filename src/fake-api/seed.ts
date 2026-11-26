@@ -1,4 +1,7 @@
+import type { PlanUsage } from '@/features/billing/api/plan-usage.ts'
 import type { Channel } from '@/features/channels/api/channel.ts'
+
+// The data the fake back end starts from. Never changed: db.ts copies it.
 
 const MINUTE = 60_000
 const DAY = 24 * 60 * MINUTE
@@ -23,10 +26,7 @@ function douyinProfile(n: number) {
   return `https://www.douyin.com/user/MS4wLjABAAAA${String(n).padStart(64, '0')}`
 }
 
-// Made-up channels that cover every channel status and live status. Five are Listening or Recording, one
-// under the Pro plan's listener limit, so one more start fills it. Listed in no particular order:
-// listChannels() sorts them.
-export const channelsSeed: Channel[] = [
+const channelsSeed: Channel[] = [
   {
     id: 'ch_01',
     platform: 'tiktok',
@@ -184,3 +184,17 @@ export const channelsSeed: Channel[] = [
     addedAt: ago(0.2 * DAY),
   },
 ]
+
+const planSeed: PlanUsage = {
+  plan: 'pro',
+  isEnded: false,
+  listenerLimit: 6,
+  listenersUsed: 5,
+  hoursUsed: 113,
+  hoursTotal: 200,
+}
+
+export const db = {
+  channels: structuredClone(channelsSeed),
+  plan: structuredClone(planSeed),
+}

@@ -1,11 +1,6 @@
 import type { Channel, ChannelList } from '@/features/channels/api/channel.ts'
-import { channelsSeed } from './channels-seed.ts'
+import { db } from './seed.ts'
 import { isScenarioOn } from './scenarios.ts'
-
-// Stands in for the back end, kept in memory: a reload starts again from the seed data. Functions keep
-// the real names and shapes, and only the features' query hooks call them, so switching to the real API
-// changes no page.
-const channels = structuredClone(channelsSeed)
 
 const LATENCY_MS = 600
 
@@ -30,21 +25,13 @@ export async function listChannels(): Promise<ChannelList> {
   listedOnce = true
   const items = isScenarioOn('channels.no-channels')
     ? []
-    : channels.toSorted((a, b) => Date.parse(b.addedAt) - Date.parse(a.addedAt))
+    : db.channels.toSorted((a, b) => Date.parse(b.addedAt) - Date.parse(a.addedAt))
   // Copies, as a real response would be, so changing the store never changes cached data in place.
   return { items: structuredClone(items), total: items.length }
 }
 
-/** For the other fake modules, which share this store. Counts what listChannels() would return. */
-export function countListeners() {
-  if (isScenarioOn('channels.no-channels')) {
-    return 0
-  }
-  return channels.filter(({ status }) => status !== 'stopped').length
-}
-
 function findChannel(channelId: string) {
-  const channel = channels.find(({ id }) => id === channelId)
+  const channel = db.channels.find(({ id }) => id === channelId)
   return channel ?? fail(`no channel ${channelId}`)
 }
 
