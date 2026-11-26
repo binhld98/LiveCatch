@@ -4,17 +4,11 @@ import { Link } from 'react-router'
 import { Badge } from '@/components/ui/badge.tsx'
 import { buttonVariants } from '@/components/ui/button.tsx'
 import { SidebarMenu } from '@/components/ui/sidebar.tsx'
+import { Skeleton } from '@/components/ui/skeleton.tsx'
+import { type PlanUsage as PlanUsageData, planLabels } from '@/features/billing/api/plan-usage.ts'
 import usePlanUsage from '@/features/billing/api/use-plan-usage.ts'
 import NavMenuItem from './nav-menu-item.tsx'
 import useCloseDrawerOnPick from './use-close-drawer-on-pick.ts'
-
-// Placeholders until S2-4 adds plan data. The card, the rail gauge and its tooltip all read from here.
-const planPlaceholder = {
-  planName: 'Free trial',
-  hoursUsed: 7.5,
-  hoursTotal: 10,
-  listenersTotal: 3,
-}
 
 type UsageMeterProps = {
   label: string
@@ -49,37 +43,64 @@ function UsageMeter({ label, name, used, total }: UsageMeterProps) {
   )
 }
 
+function planBadgeText({ plan, isEnded }: PlanUsageData) {
+  if (isEnded) {
+    return plan === 'trial' ? 'Trial ended' : 'Plan ended'
+  }
+  return planLabels[plan]
+}
+
+// Mirrors the badge and meter rows at their heights, so the card doesn't grow when the usage loads.
+function PlanUsagePlaceholder() {
+  return (
+    <>
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-muted-foreground">Current plan</span>
+        <Skeleton className="h-5 w-16 rounded-4xl" />
+      </div>
+      <Skeleton className="h-8" />
+      <Skeleton className="h-8" />
+    </>
+  )
+}
+
 // The card shows in the expanded sidebar and the phone drawer. The rail shows a gauge link instead.
 function PlanUsage() {
   const closeDrawer = useCloseDrawerOnPick()
-  // 0 until the count loads, and if it fails to.
-  const listenersUsed = usePlanUsage().data?.listenersUsed ?? 0
-  const planUsage = { ...planPlaceholder, listenersUsed }
-  const hoursSummary = `${planUsage.hoursUsed} of ${planUsage.hoursTotal} hours used`
-  const listenersSummary = `${planUsage.listenersUsed} of ${planUsage.listenersTotal} listeners used`
+  const { data: usage, isPending } = usePlanUsage()
+  const summary =
+    usage &&
+    `${usage.hoursUsed} of ${usage.hoursTotal} hours used, ${usage.listenersUsed} of ${usage.listenerLimit} listeners used`
 
   return (
     <>
       <section
         aria-label="Plan usage"
+        aria-busy={isPending}
         className="flex flex-col gap-3 rounded-lg border bg-background p-3 text-sm group-data-[collapsible=icon]:hidden"
       >
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-muted-foreground">Current plan</span>
-          <Badge variant="outline">{planUsage.planName}</Badge>
-        </div>
-        <UsageMeter
-          label="Hours used"
-          name="Recording hours used"
-          used={planUsage.hoursUsed}
-          total={planUsage.hoursTotal}
-        />
-        <UsageMeter
-          label="Listeners used"
-          name="Listeners used"
-          used={planUsage.listenersUsed}
-          total={planUsage.listenersTotal}
-        />
+        {/* A failed load leaves only "Upgrade plan": the usage refetches on the next focus. */}
+        {isPending && <PlanUsagePlaceholder />}
+        {usage && (
+          <>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-muted-foreground">Current plan</span>
+              <Badge variant="outline">{planBadgeText(usage)}</Badge>
+            </div>
+            <UsageMeter
+              label="Hours used"
+              name="Recording hours used"
+              used={usage.hoursUsed}
+              total={usage.hoursTotal}
+            />
+            <UsageMeter
+              label="Listeners used"
+              name="Listeners used"
+              used={usage.listenersUsed}
+              total={usage.listenerLimit}
+            />
+          </>
+        )}
         {/* No active state on /billing: only the rail gauge has one. */}
         <Link
           to="/billing"
@@ -94,12 +115,19 @@ function PlanUsage() {
           label="Plan usage"
           to="/billing"
           icon={GaugeIcon}
-          aria-label={`Plan usage: ${hoursSummary}, ${listenersSummary}`}
+          aria-label={summary && `Plan usage: ${planBadgeText(usage)}, ${summary}`}
           tooltip={
-            <span className="flex flex-col">
-              <span>{hoursSummary}</span>
-              <span>{listenersSummary}</span>
-            </span>
+            usage && (
+              <span className="flex flex-col">
+                <span>{planBadgeText(usage)}</span>
+                <span>
+                  {usage.hoursUsed} of {usage.hoursTotal} hours used
+                </span>
+                <span>
+                  {usage.listenersUsed} of {usage.listenerLimit} listeners used
+                </span>
+              </span>
+            )
           }
         />
       </SidebarMenu>
