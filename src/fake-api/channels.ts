@@ -35,6 +35,14 @@ export async function listChannels(): Promise<ChannelList> {
   return { items: structuredClone(items), total: items.length }
 }
 
+/** For the other fake modules, which share this store. Counts what listChannels() would return. */
+export function countListeners() {
+  if (isScenarioOn('channels.no-channels')) {
+    return 0
+  }
+  return channels.filter(({ status }) => status !== 'stopped').length
+}
+
 function findChannel(channelId: string) {
   const channel = channels.find(({ id }) => id === channelId)
   return channel ?? fail(`no channel ${channelId}`)

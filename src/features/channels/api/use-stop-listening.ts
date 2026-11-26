@@ -8,8 +8,12 @@ function useStopListening() {
 
   return useMutation({
     mutationFn: (channelId: string) => stopListening(channelId),
-    // Returned, so the mutation stays pending until the card shows its new status.
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['channels'] }),
+    // Returned, so the mutation stays pending until the card and the sidebar count show the change.
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['channels'] }),
+        queryClient.invalidateQueries({ queryKey: ['plan-usage'] }),
+      ]),
     onError: () => {
       toast("Couldn't stop listening. Try again.")
     },
