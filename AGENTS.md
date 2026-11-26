@@ -49,7 +49,7 @@ Comment only what the code can't say, such as a reason, a constraint, or surpris
 `main` is the only long-lived branch and must stay releasable.
 
 1. Do each card in its own `<type>/<slug>` branch from `main`, such as `feat/add-channel`. Small side changes can ride along as their own commits.
-2. When the work is done, ask the user to review it. Repeat for each round of revisions.
+2. When the work is done, ask the user to review it before commiting. Repeat for each round of revisions.
 3. When the user approves, commit anything left, push the branch and open a PR into `main`.
 4. Never merge the PR yourself. The user squash merges it and deletes the remote branch on GitHub.
 5. When the user confirms the PR is done, switch to `main`, pull it, and delete the local branch.
