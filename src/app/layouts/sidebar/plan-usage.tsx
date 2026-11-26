@@ -4,20 +4,17 @@ import { Link } from 'react-router'
 import { Badge } from '@/components/ui/badge.tsx'
 import { buttonVariants } from '@/components/ui/button.tsx'
 import { SidebarMenu } from '@/components/ui/sidebar.tsx'
+import usePlanUsage from '@/features/billing/api/use-plan-usage.ts'
 import NavMenuItem from './nav-menu-item.tsx'
 import useCloseDrawerOnPick from './use-close-drawer-on-pick.ts'
 
-// Placeholders until the app has plan data. The card, the rail gauge and its tooltip all read from here.
-const planUsage = {
+// Placeholders until S2-4 adds plan data. The card, the rail gauge and its tooltip all read from here.
+const planPlaceholder = {
   planName: 'Free trial',
   hoursUsed: 7.5,
   hoursTotal: 10,
-  listenersUsed: 2,
   listenersTotal: 3,
 }
-
-const hoursSummary = `${planUsage.hoursUsed} of ${planUsage.hoursTotal} hours used`
-const listenersSummary = `${planUsage.listenersUsed} of ${planUsage.listenersTotal} listeners used`
 
 type UsageMeterProps = {
   label: string
@@ -55,6 +52,11 @@ function UsageMeter({ label, name, used, total }: UsageMeterProps) {
 // The card shows in the expanded sidebar and the phone drawer. The rail shows a gauge link instead.
 function PlanUsage() {
   const closeDrawer = useCloseDrawerOnPick()
+  // 0 until the count loads, and if it fails to.
+  const listenersUsed = usePlanUsage().data?.listenersUsed ?? 0
+  const planUsage = { ...planPlaceholder, listenersUsed }
+  const hoursSummary = `${planUsage.hoursUsed} of ${planUsage.hoursTotal} hours used`
+  const listenersSummary = `${planUsage.listenersUsed} of ${planUsage.listenersTotal} listeners used`
 
   return (
     <>

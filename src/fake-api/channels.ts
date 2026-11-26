@@ -1,11 +1,11 @@
-import type { ChannelList } from '@/features/channels/api/channel.ts'
+import type { Channel, ChannelList } from '@/features/channels/api/channel.ts'
 import { channelsSeed } from './channels-seed.ts'
 import { isScenarioOn } from './scenarios.ts'
 
 // Stands in for the back end, kept in memory: a reload starts again from the seed data. Functions keep
 // the real names and shapes, and only the features' query hooks call them, so switching to the real API
 // changes no page.
-const channels = channelsSeed
+const channels = structuredClone(channelsSeed)
 
 const LATENCY_MS = 600
 
@@ -13,20 +13,75 @@ function latency() {
   return new Promise<void>((resolve) => setTimeout(resolve, LATENCY_MS))
 }
 
+function fail(message: string): never {
+  throw new Error(`Fake API: ${message}`)
+}
+
 let listedOnce = false
 
 /** Newest added first. */
 export async function listChannels(): Promise<ChannelList> {
   await latency()
-  if (isScenarioOn('channels.load-fails') || (isScenarioOn('channels.refetch-fails') && listedOnce)) {
+  if (isScenarioOn('channels.loading-fails') || (isScenarioOn('channels.reloading-fails') && listedOnce)) {
     // Logged because a failed refetch leaves the page as it was.
     console.info('Fake API: listChannels failed.')
-    throw new Error('Fake API: listChannels failed')
+    fail('listChannels failed')
   }
   listedOnce = true
-  const items = isScenarioOn('channels.empty')
+  const items = isScenarioOn('channels.no-channels')
     ? []
     : channels.toSorted((a, b) => Date.parse(b.addedAt) - Date.parse(a.addedAt))
   // Copies, as a real response would be, so changing the store never changes cached data in place.
   return { items: structuredClone(items), total: items.length }
+}
+
+/** For the other fake modules, which share this store. Counts what listChannels() would return. */
+export function countListeners() {
+  if (isScenarioOn('channels.no-channels')) {
+    return 0
+  }
+  return channels.filter(({ status }) => status !== 'stopped').length
+}
+
+function findChannel(channelId: string) {
+  const channel = channels.find(({ id }) => id === channelId)
+  return channel ?? fail(`no channel ${channelId}`)
+}
+
+/** A channel already Listening or Recording comes back unchanged. */
+export async function startListening(channelId: string): Promise<Channel> {
+  await latency()
+  if (isScenarioOn('channels.start-listening-fails')) {
+    fail('startListening failed')
+  }
+  const channel = findChannel(channelId)
+  if (channel.status === 'stopped') {
+    // The fake checks the channel at once, so it never sits Listening with no live status.
+    Object.assign(channel, {
+      status: 'listening',
+      liveStatus: 'notLive',
+      lastCheckedAt: new Date().toISOString(),
+      broadcastTitle: null,
+    } satisfies Partial<Channel>)
+  }
+  return structuredClone(channel)
+}
+
+/** A Stopped channel comes back unchanged, and a Recording one fails. */
+export async function stopListening(channelId: string): Promise<Channel> {
+  await latency()
+  if (isScenarioOn('channels.stop-listening-fails')) {
+    fail('stopListening failed')
+  }
+  const channel = findChannel(channelId)
+  if (channel.status === 'recording') {
+    fail(`channel ${channelId} is recording, so it needs stopRecording`)
+  }
+  Object.assign(channel, {
+    status: 'stopped',
+    liveStatus: null,
+    lastCheckedAt: null,
+    broadcastTitle: null,
+  } satisfies Partial<Channel>)
+  return structuredClone(channel)
 }

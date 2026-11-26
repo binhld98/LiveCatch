@@ -1,10 +1,13 @@
-// Lets anyone reach a state on purpose: open any page with ?scenario=channels.empty, or several names
-// separated by commas. The tab keeps them until a page opens with ?scenario= and no value. It ships in
-// the Pages build, which runs on the fake API too. Names are `<area>.<scenario>`, so areas never clash.
+// Lets anyone reach a state on purpose: open any page with ?scenario=channels.no-channels, or several
+// names separated by commas. The tab keeps them until a page opens with ?scenario= and no value. It ships
+// in the Pages build, which runs on the fake API too. Names are `<area>.<scenario>`, so areas never
+// clash. A failure is named after the action the user sees fail, and a data state after what they see.
 const scenarios = {
-  'channels.empty': 'The user has no channels.',
-  'channels.load-fails': 'Loading channels always fails.',
-  'channels.refetch-fails': 'The first load of channels works, and every later one fails.',
+  'channels.no-channels': 'The user has no channels.',
+  'channels.loading-fails': 'Loading channels always fails.',
+  'channels.reloading-fails': 'The first load of channels works, and every later one fails.',
+  'channels.start-listening-fails': 'Starting listening always fails.',
+  'channels.stop-listening-fails': 'Stopping listening always fails.',
 } as const
 
 export type Scenario = keyof typeof scenarios

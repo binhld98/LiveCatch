@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/ui/sonner.tsx'
 import { TooltipProvider } from '@/components/ui/tooltip.tsx'
 import AppError from './app-error.tsx'
 import AppRoutes from './app-routes.tsx'
@@ -9,6 +10,8 @@ function App() {
       <TooltipProvider>
         <AppRoutes />
       </TooltipProvider>
+      {/* Light until the app has a theme switch: with no ThemeProvider, the Toaster would follow the OS. */}
+      <Toaster theme="light" position="top-center" />
     </ErrorBoundary>
   )
 }
