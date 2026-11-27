@@ -1,17 +1,11 @@
 import type { Channel, ChannelList } from '@/features/channels/api/channel.ts'
-import { channelsSeed } from './channels-seed.ts'
+import type {
+  ListeningRefusalCode,
+  StartListeningResult,
+} from '@/features/channels/api/listening.ts'
+import { countListeners, db } from './db.ts'
+import { latency } from './network.ts'
 import { isScenarioOn } from './scenarios.ts'
-
-// Stands in for the back end, kept in memory: a reload starts again from the seed data. Functions keep
-// the real names and shapes, and only the features' query hooks call them, so switching to the real API
-// changes no page.
-const channels = structuredClone(channelsSeed)
-
-const LATENCY_MS = 600
-
-function latency() {
-  return new Promise<void>((resolve) => setTimeout(resolve, LATENCY_MS))
-}
 
 function fail(message: string): never {
   throw new Error(`Fake API: ${message}`)
@@ -30,32 +24,43 @@ export async function listChannels(): Promise<ChannelList> {
   listedOnce = true
   const items = isScenarioOn('channels.no-channels')
     ? []
-    : channels.toSorted((a, b) => Date.parse(b.addedAt) - Date.parse(a.addedAt))
+    : db.channels.toSorted((a, b) => Date.parse(b.addedAt) - Date.parse(a.addedAt))
   // Copies, as a real response would be, so changing the store never changes cached data in place.
   return { items: structuredClone(items), total: items.length }
 }
 
-/** For the other fake modules, which share this store. Counts what listChannels() would return. */
-export function countListeners() {
-  if (isScenarioOn('channels.no-channels')) {
-    return 0
-  }
-  return channels.filter(({ status }) => status !== 'stopped').length
-}
-
 function findChannel(channelId: string) {
-  const channel = channels.find(({ id }) => id === channelId)
+  const channel = db.channels.find(({ id }) => id === channelId)
   return channel ?? fail(`no channel ${channelId}`)
 }
 
-/** A channel already Listening or Recording comes back unchanged. */
-export async function startListening(channelId: string): Promise<Channel> {
+// Null when listening may start. An ended trial or plan wins over hours, and hours over the listener limit.
+function getListeningRefusalCode(): ListeningRefusalCode | null {
+  const { plan, isEnded, hoursUsed, hoursTotal, listenerLimit } = db.plan
+  if (isEnded) {
+    return plan === 'trial' ? 'trialEnded' : 'planEnded'
+  }
+  if (hoursUsed >= hoursTotal) {
+    return 'noHoursLeft'
+  }
+  if (countListeners() >= listenerLimit) {
+    return 'listenerLimit'
+  }
+  return null
+}
+
+/** A channel already Listening or Recording comes back started and unchanged, never refused. */
+export async function startListening(channelId: string): Promise<StartListeningResult> {
   await latency()
   if (isScenarioOn('channels.start-listening-fails')) {
     fail('startListening failed')
   }
   const channel = findChannel(channelId)
   if (channel.status === 'stopped') {
+    const refusalCode = getListeningRefusalCode()
+    if (refusalCode) {
+      return { status: 'refused', refusalCode }
+    }
     // The fake checks the channel at once, so it never sits Listening with no live status.
     Object.assign(channel, {
       status: 'listening',
@@ -64,7 +69,7 @@ export async function startListening(channelId: string): Promise<Channel> {
       broadcastTitle: null,
     } satisfies Partial<Channel>)
   }
-  return structuredClone(channel)
+  return { status: 'started', channel: structuredClone(channel) }
 }
 
 /** A Stopped channel comes back unchanged, and a Recording one fails. */

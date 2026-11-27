@@ -4,29 +4,20 @@ import { Link } from 'react-router'
 import { Badge } from '@/components/ui/badge.tsx'
 import { buttonVariants } from '@/components/ui/button.tsx'
 import { SidebarMenu } from '@/components/ui/sidebar.tsx'
-import usePlanUsage from '@/features/billing/api/use-plan-usage.ts'
+import type { PlanUsage as PlanUsageData } from '@/features/billing/api/plan-usage.ts'
+import { usePlanUsage } from '@/features/billing/api/use-plan-usage.ts'
 import NavMenuItem from './nav-menu-item.tsx'
 import useCloseDrawerOnPick from './use-close-drawer-on-pick.ts'
 
-// Placeholders until S2-4 adds plan data. The card, the rail gauge and its tooltip all read from here.
-const planPlaceholder = {
-  planName: 'Free trial',
-  hoursUsed: 7.5,
-  hoursTotal: 10,
-  listenersTotal: 3,
-}
-
 type UsageMeterProps = {
   label: string
-  // The meter's accessible name, when it should say more than the visible label.
-  name: string
   used: number
   total: number
 }
 
 // A Base UI Meter, not shadcn's progress: this is an amount out of a limit, not a task in progress.
 // Screen readers get the name and "7.5 of 10" from the meter, so the visible row is hidden from them.
-function UsageMeter({ label, name, used, total }: UsageMeterProps) {
+function UsageMeter({ label, used, total }: UsageMeterProps) {
   return (
     <div className="flex flex-col gap-1.5">
       <div aria-hidden="true" className="flex items-baseline justify-between gap-2">
@@ -38,7 +29,7 @@ function UsageMeter({ label, name, used, total }: UsageMeterProps) {
       <Meter.Root
         value={used}
         max={total}
-        aria-label={name}
+        aria-label={label}
         getAriaValueText={() => `${used} of ${total}`}
       >
         <Meter.Track className="h-1.5 overflow-hidden rounded-full bg-muted">
@@ -49,14 +40,16 @@ function UsageMeter({ label, name, used, total }: UsageMeterProps) {
   )
 }
 
+function planName({ plan, isEnded }: PlanUsageData) {
+  const name = `${plan.charAt(0).toUpperCase()}${plan.slice(1)}`
+  return isEnded ? `${name} ended` : name
+}
+
 // The card shows in the expanded sidebar and the phone drawer. The rail shows a gauge link instead.
 function PlanUsage() {
   const closeDrawer = useCloseDrawerOnPick()
-  // 0 until the count loads, and if it fails to.
-  const listenersUsed = usePlanUsage().data?.listenersUsed ?? 0
-  const planUsage = { ...planPlaceholder, listenersUsed }
-  const hoursSummary = `${planUsage.hoursUsed} of ${planUsage.hoursTotal} hours used`
-  const listenersSummary = `${planUsage.listenersUsed} of ${planUsage.listenersTotal} listeners used`
+  const { data: usage } = usePlanUsage()
+  const planText = usage && planName(usage)
 
   return (
     <>
@@ -64,21 +57,20 @@ function PlanUsage() {
         aria-label="Plan usage"
         className="flex flex-col gap-3 rounded-lg border bg-background p-3 text-sm group-data-[collapsible=icon]:hidden"
       >
-        <div className="flex items-center justify-between gap-2">
+        {/* h-5 is the badge's height, so the row doesn't grow when the plan loads. */}
+        <div className="flex h-5 items-center justify-between gap-2">
           <span className="text-muted-foreground">Current plan</span>
-          <Badge variant="outline">{planUsage.planName}</Badge>
+          {planText && <Badge variant="outline">{planText}</Badge>}
         </div>
         <UsageMeter
           label="Hours used"
-          name="Recording hours used"
-          used={planUsage.hoursUsed}
-          total={planUsage.hoursTotal}
+          used={usage?.hoursUsed ?? 0}
+          total={usage?.hoursTotal ?? 0}
         />
         <UsageMeter
           label="Listeners used"
-          name="Listeners used"
-          used={planUsage.listenersUsed}
-          total={planUsage.listenersTotal}
+          used={usage?.listenersUsed ?? 0}
+          total={usage?.listenerLimit ?? 0}
         />
         {/* No active state on /billing: only the rail gauge has one. */}
         <Link
@@ -90,18 +82,7 @@ function PlanUsage() {
         </Link>
       </section>
       <SidebarMenu className="hidden group-data-[collapsible=icon]:flex">
-        <NavMenuItem
-          label="Plan usage"
-          to="/billing"
-          icon={GaugeIcon}
-          aria-label={`Plan usage: ${hoursSummary}, ${listenersSummary}`}
-          tooltip={
-            <span className="flex flex-col">
-              <span>{hoursSummary}</span>
-              <span>{listenersSummary}</span>
-            </span>
-          }
-        />
+        <NavMenuItem label="Plan usage" to="/billing" icon={GaugeIcon} />
       </SidebarMenu>
     </>
   )

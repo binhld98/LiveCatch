@@ -1,4 +1,7 @@
+import type { PlanUsage } from '@/features/billing/api/plan-usage.ts'
 import type { Channel } from '@/features/channels/api/channel.ts'
+
+// The data the fake back end starts from. Never changed: db.ts copies it.
 
 const MINUTE = 60_000
 const DAY = 24 * 60 * MINUTE
@@ -23,8 +26,6 @@ function douyinProfile(n: number) {
   return `https://www.douyin.com/user/MS4wLjABAAAA${String(n).padStart(64, '0')}`
 }
 
-// Made-up channels that cover every channel status and live status on both platforms. Listed in no
-// particular order: listChannels() sorts them.
 export const channelsSeed: Channel[] = [
   {
     id: 'ch_01',
@@ -98,9 +99,9 @@ export const channelsSeed: Channel[] = [
     username: 'lcdemo88',
     avatarUrl: null,
     profileUrl: douyinProfile(6),
-    status: 'recording',
-    liveStatus: 'live',
-    lastCheckedAt: ago(0.5 * MINUTE),
+    status: 'stopped',
+    liveStatus: null,
+    lastCheckedAt: null,
     broadcastTitle: null,
     addedAt: ago(11 * DAY),
   },
@@ -124,9 +125,9 @@ export const channelsSeed: Channel[] = [
     username: null,
     avatarUrl: avatar('#1d4ed8'),
     profileUrl: douyinProfile(8),
-    status: 'listening',
-    liveStatus: 'notLive',
-    lastCheckedAt: ago(3 * MINUTE),
+    status: 'stopped',
+    liveStatus: null,
+    lastCheckedAt: null,
     broadcastTitle: null,
     addedAt: ago(21 * DAY),
   },
@@ -137,9 +138,9 @@ export const channelsSeed: Channel[] = [
     username: 'lc.demo.studioclay',
     avatarUrl: avatar('#b45309'),
     profileUrl: tiktokProfile('lc.demo.studioclay'),
-    status: 'listening',
-    liveStatus: 'live',
-    lastCheckedAt: ago(0.1 * MINUTE),
+    status: 'stopped',
+    liveStatus: null,
+    lastCheckedAt: null,
     broadcastTitle: null,
     addedAt: ago(30 * DAY),
   },
@@ -150,9 +151,9 @@ export const channelsSeed: Channel[] = [
     username: 'lcdemo_laowang',
     avatarUrl: avatar('#475569'),
     profileUrl: douyinProfile(10),
-    status: 'listening',
-    liveStatus: 'unknown',
-    lastCheckedAt: ago(3 * 60 * MINUTE),
+    status: 'stopped',
+    liveStatus: null,
+    lastCheckedAt: null,
     broadcastTitle: null,
     addedAt: ago(44 * DAY),
   },
@@ -176,10 +177,19 @@ export const channelsSeed: Channel[] = [
     username: 'lc.demo.gardenhour',
     avatarUrl: null,
     profileUrl: tiktokProfile('lc.demo.gardenhour'),
-    status: 'recording',
-    liveStatus: 'live',
-    lastCheckedAt: ago(1.5 * MINUTE),
+    status: 'stopped',
+    liveStatus: null,
+    lastCheckedAt: null,
     broadcastTitle: null,
     addedAt: ago(0.2 * DAY),
   },
 ]
+
+export const planSeed: PlanUsage = {
+  plan: 'pro',
+  isEnded: false,
+  listenerLimit: 6,
+  listenersUsed: 5,
+  hoursUsed: 113,
+  hoursTotal: 200,
+}

@@ -8,6 +8,10 @@ const scenarios = {
   'channels.reloading-fails': 'The first load of channels works, and every later one fails.',
   'channels.start-listening-fails': 'Starting listening always fails.',
   'channels.stop-listening-fails': 'Stopping listening always fails.',
+  'plan.listener-limit-reached': 'Every listener on the plan is in use, until a channel stops listening.',
+  'plan.no-hours-left': 'The plan has used all its recording hours.',
+  'plan.trial-ended': 'The free trial has ended.',
+  'plan.plan-ended': 'The Pro plan has ended.',
 } as const
 
 export type Scenario = keyof typeof scenarios
