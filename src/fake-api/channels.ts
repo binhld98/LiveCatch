@@ -1,12 +1,7 @@
 import type { Channel, ChannelList } from '@/features/channels/api/channel.ts'
-import { db } from './seed.ts'
+import { db } from './db.ts'
+import { latency } from './network.ts'
 import { isScenarioOn } from './scenarios.ts'
-
-const LATENCY_MS = 600
-
-function latency() {
-  return new Promise<void>((resolve) => setTimeout(resolve, LATENCY_MS))
-}
 
 function fail(message: string): never {
   throw new Error(`Fake API: ${message}`)

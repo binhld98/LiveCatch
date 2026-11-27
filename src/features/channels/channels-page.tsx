@@ -1,5 +1,5 @@
 import PageHeader from '@/components/page-header.tsx'
-import useChannels from './api/use-channels.ts'
+import { useChannels } from './api/use-channels.ts'
 import ChannelGrid from './components/channel-grid.tsx'
 import ChannelGridPlaceholder from './components/channel-grid-placeholder.tsx'
 import LoadFailed from './components/load-failed.tsx'

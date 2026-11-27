@@ -1,8 +1,7 @@
 import { Button } from '@/components/ui/button.tsx'
 import { Spinner } from '@/components/ui/spinner.tsx'
 import type { Channel } from '../../api/channel.ts'
-import useStartListening from '../../api/use-start-listening.ts'
-import useStopListening from '../../api/use-stop-listening.ts'
+import { useStartListening, useStopListening } from '../../api/use-listening.ts'
 
 const looks = {
   stopped: { text: 'Start listening', variant: 'default' },

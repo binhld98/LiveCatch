@@ -26,7 +26,7 @@ function douyinProfile(n: number) {
   return `https://www.douyin.com/user/MS4wLjABAAAA${String(n).padStart(64, '0')}`
 }
 
-const channelsSeed: Channel[] = [
+export const channelsSeed: Channel[] = [
   {
     id: 'ch_01',
     platform: 'tiktok',
@@ -185,16 +185,11 @@ const channelsSeed: Channel[] = [
   },
 ]
 
-const planSeed: PlanUsage = {
+export const planSeed: PlanUsage = {
   plan: 'pro',
   isEnded: false,
   listenerLimit: 6,
   listenersUsed: 5,
   hoursUsed: 113,
   hoursTotal: 200,
-}
-
-export const db = {
-  channels: structuredClone(channelsSeed),
-  plan: structuredClone(planSeed),
 }
