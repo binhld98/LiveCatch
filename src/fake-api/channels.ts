@@ -1,7 +1,7 @@
 import type { Channel, ChannelList } from '@/features/channels/api/channel.ts'
-import {
-  type ListeningRefusalCode,
-  ListeningRefusedError,
+import type {
+  ListeningRefusalCode,
+  StartListeningResult,
 } from '@/features/channels/api/listening.ts'
 import { countListeners, db } from './db.ts'
 import { latency } from './network.ts'
@@ -49,11 +49,8 @@ function getListeningRefusalCode(): ListeningRefusalCode | null {
   return null
 }
 
-/**
- * Throws ListeningRefusedError when the plan doesn't allow another listener.
- * A channel already Listening or Recording comes back unchanged.
- */
-export async function startListening(channelId: string): Promise<Channel> {
+/** A channel already Listening or Recording comes back started and unchanged, never refused. */
+export async function startListening(channelId: string): Promise<StartListeningResult> {
   await latency()
   if (isScenarioOn('channels.start-listening-fails')) {
     fail('startListening failed')
@@ -62,7 +59,7 @@ export async function startListening(channelId: string): Promise<Channel> {
   if (channel.status === 'stopped') {
     const refusalCode = getListeningRefusalCode()
     if (refusalCode) {
-      throw new ListeningRefusedError(refusalCode)
+      return { status: 'refused', refusalCode }
     }
     // The fake checks the channel at once, so it never sits Listening with no live status.
     Object.assign(channel, {
@@ -72,7 +69,7 @@ export async function startListening(channelId: string): Promise<Channel> {
       broadcastTitle: null,
     } satisfies Partial<Channel>)
   }
-  return structuredClone(channel)
+  return { status: 'started', channel: structuredClone(channel) }
 }
 
 /** A Stopped channel comes back unchanged, and a Recording one fails. */
