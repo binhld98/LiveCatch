@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog.tsx'
-import useUpgradeDialog, { closeUpgradeDialog, type UpgradeReason } from '@/hooks/use-upgrade-dialog.ts'
+import { useUpgradeDialog, closeUpgradeDialog, type UpgradeReason } from '@/hooks/use-upgrade-dialog.ts'
 
 function upgradeText(reason: UpgradeReason) {
   switch (reason) {

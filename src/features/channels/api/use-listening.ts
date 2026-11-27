@@ -11,8 +11,7 @@ export function useStartListening() {
 
   return useMutation({
     mutationFn: (channelId: string) => startListening(channelId),
-    // Here, not in mutate(): TanStack skips mutate()'s callbacks once the card has unmounted, and a
-    // refusal must still open the dialog after the user has left the page.
+    // Not in mutate(): TanStack skips its callbacks once the card has unmounted, but the dialog must still open.
     onSuccess: async (result) => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['channels'] }),

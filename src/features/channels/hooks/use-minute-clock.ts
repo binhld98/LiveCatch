@@ -27,8 +27,6 @@ function getSnapshot() {
 }
 
 // The current time in milliseconds, updated once a minute. Only the component that calls it re-renders.
-function useMinuteClock() {
+export function useMinuteClock() {
   return useSyncExternalStore(subscribe, getSnapshot)
 }
-
-export default useMinuteClock

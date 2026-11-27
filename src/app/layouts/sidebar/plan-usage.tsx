@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge.tsx'
 import { buttonVariants } from '@/components/ui/button.tsx'
 import { SidebarMenu } from '@/components/ui/sidebar.tsx'
 import type { PlanUsage as PlanUsageData } from '@/features/billing/api/plan-usage.ts'
-import usePlanUsage from '@/features/billing/api/use-plan-usage.ts'
+import { usePlanUsage } from '@/features/billing/api/use-plan-usage.ts'
 import NavMenuItem from './nav-menu-item.tsx'
 import useCloseDrawerOnPick from './use-close-drawer-on-pick.ts'
 
@@ -41,10 +41,8 @@ function UsageMeter({ label, used, total }: UsageMeterProps) {
 }
 
 function planName({ plan, isEnded }: PlanUsageData) {
-  if (isEnded) {
-    return plan === 'trial' ? 'Trial ended' : 'Plan ended'
-  }
-  return `${plan.charAt(0).toUpperCase()}${plan.slice(1)} plan`
+  const name = `${plan.charAt(0).toUpperCase()}${plan.slice(1)}`
+  return isEnded ? `${name} ended` : name
 }
 
 // The card shows in the expanded sidebar and the phone drawer. The rail shows a gauge link instead.
@@ -84,13 +82,7 @@ function PlanUsage() {
         </Link>
       </section>
       <SidebarMenu className="hidden group-data-[collapsible=icon]:flex">
-        <NavMenuItem
-          label="Plan usage"
-          to="/billing"
-          icon={GaugeIcon}
-          aria-label={planText}
-          tooltip={planText}
-        />
+        <NavMenuItem label="Plan usage" to="/billing" icon={GaugeIcon} />
       </SidebarMenu>
     </>
   )

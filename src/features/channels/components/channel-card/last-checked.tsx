@@ -1,4 +1,4 @@
-import useMinuteClock from '../../hooks/use-minute-clock.ts'
+import { useMinuteClock } from '../../hooks/use-minute-clock.ts'
 import { checkedAgo } from '../../lib/last-checked.ts'
 
 type LastCheckedProps = {

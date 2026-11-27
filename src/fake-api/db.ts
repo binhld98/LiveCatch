@@ -8,7 +8,7 @@ function createDb() {
   const plan = structuredClone(planSeed)
 
   if (isScenarioOn('plan.listener-limit-reached')) {
-    // Relies on the seed leaving exactly one free slot: 5 of the Pro plan's 6 listeners in use.
+    // Relies on the seed leaving exactly one free listener: 5 of the Pro plan's 6 listeners in use.
     const channel = channels.find(({ status }) => status === 'stopped')
     if (channel) {
       Object.assign(channel, {

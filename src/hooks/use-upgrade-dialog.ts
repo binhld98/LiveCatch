@@ -39,8 +39,6 @@ export function closeUpgradeDialog() {
 }
 
 /** The upgrade dialog's reason and whether it's open. Only the component that calls it re-renders. */
-function useUpgradeDialog() {
+export function useUpgradeDialog() {
   return useSyncExternalStore(subscribe, getSnapshot)
 }
-
-export default useUpgradeDialog
