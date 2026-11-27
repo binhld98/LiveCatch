@@ -1,5 +1,9 @@
 import type { Channel, ChannelList } from '@/features/channels/api/channel.ts'
-import { db } from './db.ts'
+import {
+  type ListeningRefusalCode,
+  ListeningRefusedError,
+} from '@/features/channels/api/listening.ts'
+import { countListeners, db } from './db.ts'
 import { latency } from './network.ts'
 import { isScenarioOn } from './scenarios.ts'
 
@@ -30,7 +34,25 @@ function findChannel(channelId: string) {
   return channel ?? fail(`no channel ${channelId}`)
 }
 
-/** A channel already Listening or Recording comes back unchanged. */
+// Null when listening may start. An ended trial or plan wins over hours, and hours over the listener limit.
+function getListeningRefusalCode(): ListeningRefusalCode | null {
+  const { plan, isEnded, hoursUsed, hoursTotal, listenerLimit } = db.plan
+  if (isEnded) {
+    return plan === 'trial' ? 'trialEnded' : 'planEnded'
+  }
+  if (hoursUsed >= hoursTotal) {
+    return 'noHoursLeft'
+  }
+  if (countListeners() >= listenerLimit) {
+    return 'listenerLimit'
+  }
+  return null
+}
+
+/**
+ * Throws ListeningRefusedError when the plan doesn't allow another listener.
+ * A channel already Listening or Recording comes back unchanged.
+ */
 export async function startListening(channelId: string): Promise<Channel> {
   await latency()
   if (isScenarioOn('channels.start-listening-fails')) {
@@ -38,6 +60,10 @@ export async function startListening(channelId: string): Promise<Channel> {
   }
   const channel = findChannel(channelId)
   if (channel.status === 'stopped') {
+    const refusalCode = getListeningRefusalCode()
+    if (refusalCode) {
+      throw new ListeningRefusedError(refusalCode)
+    }
     // The fake checks the channel at once, so it never sits Listening with no live status.
     Object.assign(channel, {
       status: 'listening',
